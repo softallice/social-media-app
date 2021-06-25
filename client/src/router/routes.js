@@ -74,6 +74,11 @@ const routes = [
         name: 'MobileTest',
         component: () => import('pages/Mobile/Mobile.vue'),
       },
+      {
+        path: '/mobilescan',
+        name: 'MobileScan',
+        component: () => import('pages/Mobile/MobileScan.vue'),
+      },
     ]
   },
 

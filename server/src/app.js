@@ -5,6 +5,11 @@ const helmet = require('helmet');
 const cors = require('cors');
 const logger = require('./logger');
 
+//환경 변수(config 파일)등에서 숨겨야 할 정보 
+const dotenv= require('dotenv');
+dotenv.config();
+
+
 const feathers = require('@feathersjs/feathers');
 const configuration = require('@feathersjs/configuration');
 const express = require('@feathersjs/express');
@@ -25,13 +30,37 @@ const app = express(feathers());
 // Load app configuration
 app.configure(configuration());
 // Enable security, CORS, compression, favicon and body parsing
+const whitelist = [app.get('client_url')] || [process.env.client_url] ;
+console.log('whitelist : ', whitelist);
+const corsOptions = {
+  origin: (origin, callback) => {
+    // if (whitelist.indexOf(origin) !== -1) { 
+    if (!origin || whitelist.indexOf(origin) !== -1) { //test
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS: ' + origin));
+    }
+  },
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+
 app.use(helmet({
   contentSecurityPolicy: false
 }));
-app.use(cors());
+app.use(cors(corsOptions));
+
 app.use(compress());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+// important - upload limit!
+// 파일 사이즈 제한
+app.use(express.json({limit: '100mb'}));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
+
 app.use(favicon(path.join(app.get('public'), 'favicon.ico')));
 // Host the public folder
 app.use('/', express.static(app.get('public')));

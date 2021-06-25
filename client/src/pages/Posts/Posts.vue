@@ -26,17 +26,28 @@
                     <q-separator />
 
                     <q-card-actions align="center">
-                        <q-uploader
-                            url="http://localhost:4444/upload"
-                            style="max-width: 300px"
-                        />
-                        <q-btn flat align="left" class="btn-fixed-width" color="teal" label="Photo" icon="collections" />
-                        <q-btn flat align="left" class="btn-fixed-width" color="indigo" label="Tag" icon="label" />
+                        <!-- <q-btn flat align="left" class="btn-fixed-width" color="teal" label="Photo" icon="collections" /> -->
+                        <q-file
+                            class="WAL__field col-grow q-mr-sm"
+                            v-model = "isImageUpload"
+                            use-chips
+                            label="Choose an Image"
+                            accept="image/*"   
+                            
+                                                    
+                        >
+                            <template v-slot:prepend>
+                                <q-icon name="collections" color="teal" />
+                            </template>
+                        </q-file>
+                        <!-- <q-btn flat align="left" class="btn-fixed-width" color="indigo" label="Tag" icon="label" />
                         <q-btn flat align="left" class="btn-fixed-width" color="deep-orange" label="Location" icon="location_on" />
-                        <q-btn flat align="left" class="btn-fixed-width" color="brown-5" label="Feelings" icon="emoji_emotions" />
+                        <q-btn flat align="left" class="btn-fixed-width" color="brown-5" label="Feelings" icon="emoji_emotions" /> -->
                         <q-btn push color="primary" label="Share" @click="onPost(text)" />
+                        <q-btn push color="primary" label="fileUpload" @click="fileUpload()" />
                     </q-card-actions>
                 </q-card>
+
 
                 <q-card class="my-card" v-for="post in store.state.posts.slice().reverse()" :key="post.id">
                     <q-card-section>
@@ -109,12 +120,19 @@
 
 <script>
 import { ref, mounted } from 'vue'
+import { useQuasar } from 'quasar'
 import store from 'src/myStore'
+import { api } from 'boot/axios'
 
 export default {
     name: 'Posts',
     setup () {
+        const $q = useQuasar()
+        const data = ref(null)
+        let file_path = ref(null)
+
         let text = ref('')
+        let isImageUpload = ref(null)
 
         function countLike( postId ) {
             return store.getters.getPostLike( postId ).length
@@ -131,16 +149,53 @@ export default {
             text.value = null
         }
 
+        function loadData () {
+            api.get('/api/backend')
+                .then((response) => {
+                    data.value = response.data
+                })
+                .catch(() => {
+                    $q.notify({
+                        color: 'negative',
+                        position: 'top',
+                        message: 'Loading failed',
+                        icon: 'report_problem'
+                    })
+                })
+        }
+
+        function fileUpload () {
+            var file = isImageUpload.value;
+            var formData = new FormData();
+            formData.append("uri", file);
+
+            // console.log('formData : ', file)
+
+            api.post('/uploads', formData, { 
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    } 
+                })
+                .then((response) => {
+                    data.value = response.data
+                    isImageUpload.value = null
+                })
+               
+        }
 
         return {
+            isImageUpload,
             text,
             ph: ref(''),
             dense: ref(false),
             store,
+            data, 
+            loadData,
             countLike,
             countComment,
             countHeart,
             onPost,
+            fileUpload
         }
     }
 }

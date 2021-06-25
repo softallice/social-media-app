@@ -43,6 +43,12 @@ const state = reactive({
       to: '/mobile',
       icon: 'local_see',
       label: 'MobileTest'
+    },
+    {
+      root: '/mobilescan',
+      to: '/mobilescan',
+      icon: 'qr_code_scanner',
+      label: 'MobileScan'
     }
   ],
   images: [

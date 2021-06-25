@@ -6,6 +6,7 @@
     "default": 10,
     "max": 50
   },
+  "client_url": "http://localhost:8080",
   "authentication": {
     "entity": "user",
     "service": "users",

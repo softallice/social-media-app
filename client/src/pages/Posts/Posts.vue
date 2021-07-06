@@ -44,7 +44,7 @@
                         <q-btn flat align="left" class="btn-fixed-width" color="deep-orange" label="Location" icon="location_on" />
                         <q-btn flat align="left" class="btn-fixed-width" color="brown-5" label="Feelings" icon="emoji_emotions" /> -->
                         <q-btn push color="primary" label="Share" @click="onPost(text)" />
-                        <q-btn push color="primary" label="fileUpload" @click="fileUpload()" />
+                        <!-- <q-btn push color="primary" label="fileUpload" @click="fileUpload()" /> -->
                     </q-card-actions>
                 </q-card>
 
@@ -129,8 +129,7 @@ export default {
     setup () {
         const $q = useQuasar()
         const data = ref(null)
-        let file_path = ref(null)
-
+        
         let text = ref('')
         let isImageUpload = ref(null)
 
@@ -144,9 +143,25 @@ export default {
             return store.getters.getPostHeart( postId ).length
         }
 
-        function onPost( desc ) {
-            store.actions.setPostAdd( desc )
+        // TODO: 입력 및 이미지 선택 여부 검증
+        async function onPost( desc ) {
+            if (isImageUpload.value === null ) {
+                alert('이미지 필수 선택')
+                return
+            }
+            var file = isImageUpload.value;
+            var formData = new FormData();
+            formData.append("uri", file);
+            
+            const imgId = await api.post('/uploads', formData, { 
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    } 
+                })
+
+            store.actions.setPostAdd( desc, imgId.data.id )
             text.value = null
+            isImageUpload.value = null
         }
 
         function loadData () {
@@ -164,13 +179,18 @@ export default {
                 })
         }
 
-        function fileUpload () {
+        async function fileUpload () {
             var file = isImageUpload.value;
             var formData = new FormData();
             formData.append("uri", file);
-
-            // console.log('formData : ', file)
-
+            
+            // const imgId = await api.post('/uploads', formData, { 
+            //         headers: {
+            //             'Content-Type': 'multipart/form-data'
+            //         } 
+            //     })
+            // console.log(imgId)
+            // return imgId.data.id
             api.post('/uploads', formData, { 
                     headers: {
                         'Content-Type': 'multipart/form-data'
@@ -179,6 +199,8 @@ export default {
                 .then((response) => {
                     data.value = response.data
                     isImageUpload.value = null
+                    console.log(' response.data.id : ',  response.data.id)
+                    return response.data.id
                 })
                
         }

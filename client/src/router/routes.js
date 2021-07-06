@@ -79,6 +79,11 @@ const routes = [
         name: 'MobileScan',
         component: () => import('pages/Mobile/MobileScan.vue'),
       },
+      {
+        path: '/bluetooth',
+        name: 'Bluetooth',
+        component: () => import('pages/Bluetooth/Bluetooths.vue'),
+      },
     ]
   },
 

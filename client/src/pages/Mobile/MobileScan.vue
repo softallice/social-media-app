@@ -1,133 +1,54 @@
 <template>
-    <page >
-        <page-header>
-            <template #title>QR-reader</template>
-        </page-header>
-        <page-body :class="ready ? 'bg-white' : 'flex flex-center transparent'">
-            <div v-if="ready">
-                {{imageURI}}    
-            </div>
-            
-            <q-separator/>
-            
-            <div v-if="ready">
-                <button v-if="authorized" class="secondary push" @click="goScan()">Go Scan</button>
-            </div>
-            
-            <q-separator/>
-            
-            <div v-if="!ready" class="container">
-                <!-- <q-img
-                    :src="rect"
-                /> -->
-                <q-separator/>
-
-                <q-btn color="primary" label="Cancel" @click="cancelScan()"/>
-            </div>
-        </page-body>
-    </page>
+  <div>
+    <h2>Hello Scanner Test</h2>
+    <q-btn color="primary" label="Scan" @click="scanImage" />
+    <h2>{{ title }}</h2>
+  </div>
 </template>
 
 <script>
-// import { useQuasar } from 'quasar'
-import { ref , onMounted } from 'vue'
-
 export default {
-    setup () {
-
-        let ready = ref(true)
-        let imageURI = ref('')
-        let rect = 'scanner/rect.png'
-        let authorized = ref(false)
-        let selection = 'standard'
-        let selectOptions = [
-            {
-            label: 'Camera-thumbnail',
-            value: 'camera-thmb'
-            },
-            {
-            label: 'Standard',
-            value: 'standard'
-            }
-        ]
-        let enableVisibility = 'hidden'
-        let backColor = 'transparent'
-        if (!window.QRScanner) {
-           // Avoid error in web
-            return;
-        }
-
-        onMounted(() => {
-            prepDevice()
-        })
-    
-        function prepDevice () {
-            QRScanner.prepare(onDone)
-        }
-
-        function onDone (err, status) {
-            if (err) {
-                alert('preparing: error code = ' + err.code)
-            }
-            if (status.authorized) {
-                authorized.value = true
-            } else if (status.denied || !status.authorized) {
-                openSettings()
-            } else {
-                console.log('onDone : ', onDone)
-            }
-        }
-
-        function goScan () {
-            authorized.value = false
-            ready.value = false
-            QRScanner.show()
-            QRScanner.scan(displayContents)
-        }
-
-        function displayContents (err, text) {
-            if (err) {
-                alert('scanning: error code = ' + err.code)
-                if (err.name === 'SCAN_CANCELED') {
-                alert('The scan was cancelled before a QR code was found.')
-                }
-            } else {
-                alert(text)
-                imageURI.value = text
-            }
-            QRScanner.destroy()
-            authorized = true
-            ready = true
-        }
-
-        function cancelScan () {
-            QRScanner.cancelScan()
-            authorized = true
-            ready = true
-        }
-
-        function openSettings () {
-            if (status.canOpenSettings) {
-                if (confirm('Would you like to enable QR code scanning? You can allow camera access in your settings.')) {
-                    QRScanner.openSettings()
-                }
-            }
-        }
-
-        return {
-            ready,
-            authorized,
-            imageURI,
-            rect,
-            goScan,
-            cancelScan
-        }
+  data() {
+    return {
+      imageSrc: '',
+      title: '',
+      description: ''
     }
+  },
+  methods: {
+    scanImage() {
+      cordova.plugins.barcodeScanner.scan(
+        result => {
+          alert(
+            'We got a barcode\n' +
+              'Result: ' +
+              result.text +
+              '\n' +
+              'Format: ' +
+              result.format +
+              '\n' +
+              'Cancelled: ' +
+              result.cancelled
+          )
+        },
+        error => {
+          alert('Scanning failed: ' + error)
+        },
+        {
+          preferFrontCamera: true, // iOS and Android
+          showFlipCameraButton: true, // iOS and Android
+          showTorchButton: true, // iOS and Android
+          torchOn: true, // Android, launch with the torch switched on (if available)
+          saveHistory: true, // Android, save scan history (default false)
+          prompt: 'Place a barcode inside the scan area', // Android
+          resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
+          //formats : "QR_CODE,PDF_417", // default: all but PDF_417 and RSS_EXPANDED
+          orientation: 'portrait', // Android only (portrait|landscape), default unset so it rotates with the device
+          disableAnimations: true, // iOS
+          disableSuccessBeep: true // iOS and Android
+        }
+      )
+    }
+  }
 }
 </script>
-<style scoped lang="scss">
-  .container {
-    flex:1;
-    align-items: 'center'
-  }
-</style>

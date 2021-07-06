@@ -102,7 +102,12 @@ module.exports = configure(function (ctx) {
 
     // animations: 'all', // --- includes all animations
     // https://v2.quasar.dev/options/animations
-    animations: ['slideInRight', 'slideOutRight', 'fadeIn', 'fadeOut'],
+    animations: [
+      'slideInRight', 
+      'slideOutRight', 
+      'fadeIn', 
+      'fadeOut'
+    ],
 
     // https://v2.quasar.dev/quasar-cli/developing-ssr/configuring-ssr
     ssr: {
@@ -185,7 +190,17 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/developing-capacitor-apps/configuring-capacitor
     capacitor: {
-      hideSplashscreen: true
+      hideSplashscreen: false, // disables auto-hiding the Splashscreen by Quasar CLI
+
+      // (Optional!)
+      capacitorCliPreparationParams: [ 'sync', ctx.targetName ],
+
+      // (Optional) If not present, will look for package.json > name
+      appName: 'Social', // string
+      // (Optional) If not present, will look for package.json > version
+      version: '0.0.1', // string
+      // (Optional) If not present, will look for package.json > description
+      description: 'Social Sample', // string
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/developing-electron-apps/configuring-electron

@@ -16,7 +16,7 @@ const blobStorage = fs('./public/images');
 
 const multer = require('multer');
 const multipartMiddleware = multer();
-
+ 
 module.exports = function (app) {
   // Initialize our service with any options it requires
 

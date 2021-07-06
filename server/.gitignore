@@ -27,6 +27,8 @@ node_modules
 # Users Environment Variables
 .lock-wscript
 
+public/images/*
+
 # IDEs and editors (shamelessly copied from @angular/cli's .gitignore)
 /.idea
 .project

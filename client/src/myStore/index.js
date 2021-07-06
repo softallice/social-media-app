@@ -49,6 +49,12 @@ const state = reactive({
       to: '/mobilescan',
       icon: 'qr_code_scanner',
       label: 'MobileScan'
+    },
+    {
+      root: '/bluetooth',
+      to: '/bluetooth',
+      icon: 'bluetooth',
+      label: 'Bluetooh'
     }
   ],
   images: [
@@ -335,12 +341,12 @@ const actions = {
       comment: comment
     })
   },
-  setPostAdd( desc ) {
+  setPostAdd( desc , imgUrl) {
     console.log('setPostAdd', desc)
     state.posts.push({
       id: (state.posts.length + 1).toString(),
       desc: desc,
-      photo: "post/3.jpeg",
+      photo: 'http://localhost:3030/images/' + imgUrl,
       date: "1 mins ago",
       userId: 3,
       like: 0,

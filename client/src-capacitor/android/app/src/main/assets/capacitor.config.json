@@ -1,0 +1,10 @@
+{
+	"appId": "org.capacitor.quasar.app",
+	"appName": "Social",
+	"bundledWebRuntime": false,
+	"npmClient": "yarn",
+	"webDir": "www",
+	"server": {
+		"url": "http://172.27.42.184:8080"
+	}
+}

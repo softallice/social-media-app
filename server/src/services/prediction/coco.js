@@ -123,16 +123,21 @@ module.exports = async ( filename ) => {
     }
 
     const annotateImage = function (prediction, imagePath, convertPath) {
-        console.log(`annotating prediction result(s)`);
+        console.log(`annotating prediction result(s) >>>>`);
+        
+        const annotatedImageBuffer = maxvis.annotate(prediction, imagePath);
+        const f = path.join(path.parse(convertPath).dir, `${path.parse(convertPath).name}-annotate.png`);
 
         maxvis.annotate(prediction, imagePath)
             .then(annotatedImageBuffer => {
             
             const f = path.join(path.parse(convertPath).dir, `${path.parse(convertPath).name}-annotate.png`);
 
+            console.log(' file path ', f)
+
             fs.writeFile(f, annotatedImageBuffer, (err) => {
                 if (err) {
-                console.error(err);
+                console.error('annotated : ' + err);
                 } else {
                 console.log(`annotated image saved as ${f}\r\n`);
                 }
